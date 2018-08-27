@@ -1,0 +1,3 @@
+[submodule "lfqueue"]
+	path = lfqueue
+	url = https://github.com/Taymindis/lfqueue.git

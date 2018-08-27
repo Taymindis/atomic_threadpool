@@ -1,38 +1,3 @@
-# atomic_threadpool
-it is c/c++ library, it's a smallest library that provides a lock-free thread pool sharing on multithreading, it design for scalability
-
-
-## For Linux OS build
-
-## Installation
-
-```bash
-mkdir build
-
-cd build
-
-cmake ..
-
-make
-
-sudo make install
-
-```
-
-
-
-## Uninstallation
-
-```bash
-cd build
-
-sudo make uninstall
-
-```
-
-
-## Example to run
-```c
 
 #include <stdio.h>
 #include <pthread.h>
@@ -88,27 +53,3 @@ int main(void) {
 
 	return 0;
 }
-
-```
-
-## For manual build
-gcc -std=c11 -I./ -Ilfqueue/ at_thpool.c lfqueue/lfqueue.c threadpool_example.c -pthread
-
-
-## for Windows os build
-
-### Recommend to use VS2017 to build
-
-#### include the sources file at_thpool.c at_thpool.h lfqueue.c lfqueue.h into VS2017 project solution.
-
-Alternatively, 
-
-#### Download the Dev-C++ IDE - https://sourceforge.net/projects/orwelldevcpp/
-
-
-
-#### You can use any IDE/build tools as you wish, just include the source files to your project
-
-
-
-
