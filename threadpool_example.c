@@ -1,6 +1,11 @@
 
 #include <stdio.h>
+#if defined __GNUC__ || defined __CYGWIN__ || defined __MINGW32__ || defined __APPLE__
 #include <pthread.h>
+#elif defined _WIN32 || _WIN64
+#include <windows.h>
+#include <Windows.h>
+#endif
 #include "at_thpool.h"
 
 
@@ -12,19 +17,19 @@ void t3(void *arg);
 void t4(void *arg);
 
 void t1(void *arg) {
-	printf("t1 is running on thread #%u \n", (int)pthread_self());
+	printf("t1 is running on thread \n");
 }
 
 void t2(void *arg) {
-	printf("t2 is running on thread #%u\n", (int)pthread_self());
+	printf("t2 is running on thread \n");
 }
 
 void t3(void *arg) {
-	printf("t3 is running on thread #%u\n", (int)pthread_self());
+	printf("t3 is running on thread \n");
 }
 
 void t4(void *arg) {
-	printf("t4 is running on thread #%u\n", (int)pthread_self());
+	printf("t4 is running on thread \n");
 }
 
 int main(void) {

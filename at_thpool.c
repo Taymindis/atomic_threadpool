@@ -29,11 +29,12 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#if defined _WIN32 || _WIN64
-#include <windows.h>
-#else
+#if defined __GNUC__ || defined __CYGWIN__ || defined __MINGW32__ || defined __APPLE__
 #include <pthread.h>
-#include <unistd.h> // for usleep
+#include <sched.h>
+#elif defined _WIN32 || _WIN64
+#include <windows.h>
+#include <Windows.h>
 #endif
 
 #include "lfqueue.h"
@@ -50,13 +51,17 @@
 #define AT_THPOOL_MALLOC malloc
 #define AT_THPOOL_FREE free
 
-#if defined _WIN32 || _WIN64
-#define AT_THPOOL_INC(v) InterlockedIncrement(v)
-#define AT_THPOOL_DEC(v) InterlockedDecrement(v)
+#if defined _WIN32 
+#define AT_THPOOL_INC(v) InterlockedExchangeAddNoFence(v, 1)
+#define AT_THPOOL_DEC(v) InterlockedExchangeAddNoFence(v, -1)
+#define AT_THPOOL_SHEDYIELD SwitchToThread
+#elif defined _WIN64
+#define AT_THPOOL_INC(v) InterlockedExchangeAddNoFence64(v, 1)
+#define AT_THPOOL_DEC(v) InterlockedExchangeAddNoFence64(v, -1)
 #define AT_THPOOL_SHEDYIELD SwitchToThread
 #else
-#define AT_THPOOL_INC(v) __atomic_fetch_add(v, 1, __ATOMIC_RELAXED)
-#define AT_THPOOL_DEC(v) __atomic_fetch_add(v, -1, __ATOMIC_RELAXED)
+#define AT_THPOOL_INC(v) __sync_fetch_and_add(v, 1)
+#define AT_THPOOL_DEC(v) __sync_fetch_and_add(v, -1)
 #define AT_THPOOL_SHEDYIELD sched_yield
 #endif
 
@@ -66,16 +71,26 @@ typedef struct {
 } at_thtask_t;
 
 struct at_thpool_s {
-    pthread_t *threads;
+#if defined __GNUC__ || defined __CYGWIN__ || defined __MINGW32__ || defined __APPLE__
+	pthread_t *threads;
+#elif defined _WIN32 || _WIN64
+	HANDLE *threads;
+#endif
     lfqueue_t taskqueue;
     int nrunning;
     int is_running;
 };
 
 
-void* at_thpool_worker(void *);
+#ifdef _WIN32 || _WIN64
+unsigned __stdcall
+#else
+void*
+#endif
+at_thpool_worker(void *);
 
-at_thpool_t *at_thpool_create(int nthreads, int task_backlog) {
+at_thpool_t *
+at_thpool_create(int nthreads, int task_backlog) {
     int i;
     if (nthreads > MAX_THREADS) {
         fprintf(stderr, "The nthreads is > %d, over max thread will affect the system scalability, it might not scale well\n", MAX_THREADS);
@@ -93,7 +108,12 @@ at_thpool_t *at_thpool_create(int nthreads, int task_backlog) {
         return NULL;
     }
 
-    tp->threads = (pthread_t *)AT_THPOOL_MALLOC(sizeof(pthread_t) * nthreads);
+#if defined __GNUC__ || defined __CYGWIN__ || defined __MINGW32__ || defined __APPLE__
+	tp->threads = (pthread_t *)AT_THPOOL_MALLOC(sizeof(pthread_t) * nthreads);
+#elif defined _WIN32 || _WIN64
+	tp->threads = (HANDLE)AT_THPOOL_MALLOC(sizeof(HANDLE) * nthreads);
+#endif
+
     tp->nrunning = 0;
     if (tp->threads == NULL) {
         AT_THPOOL_ERROR("malloc");
@@ -110,6 +130,7 @@ at_thpool_t *at_thpool_create(int nthreads, int task_backlog) {
 
     tp->is_running = 1;
 
+#if defined __GNUC__ || defined __CYGWIN__ || defined __MINGW32__ || defined __APPLE__
     for (i = 0; i < nthreads; i++) {
         if (pthread_create(&(tp->threads[i]), NULL,  at_thpool_worker, (void*)tp)) {
             if (i != 0) {
@@ -122,10 +143,30 @@ at_thpool_t *at_thpool_create(int nthreads, int task_backlog) {
         }
         pthread_detach(tp->threads[i]);
     }
+#elif defined _WIN32 || _WIN64
+	for (i = 0; i < nthreads; i++) {
+		unsigned udpthreadid;
+		tp->threads[i] = (HANDLE)_beginthreadex(NULL, 0, at_thpool_worker, (void *)tp, 0, &udpthreadid);
+		if (tp->threads[i] == 0) {
+			if (i != 0) {
+				fprintf(stderr, "maximum thread has reached %d \n", i);
+			}
+			else {
+				AT_THPOOL_ERROR("Failed to establish thread pool");
+				at_thpool_immediate_shutdown(tp);
+			}
+		}
+		CloseHandle(tp->threads[i]);
+	}
+#endif
     return tp;
 }
 
+#ifdef _WIN32 || _WIN64
+unsigned __stdcall 
+#else
 void*
+#endif // _WIN32 || _WIN64
 at_thpool_worker(void *_tp) {
     at_thpool_t *tp = (at_thpool_t*)_tp;
     AT_THPOOL_INC(&tp->nrunning);
@@ -146,7 +187,6 @@ TASK_PENDING:
     }
 
     AT_THPOOL_DEC(&tp->nrunning);
-    pthread_exit(NULL);
     return NULL;
 HANDLE_TASK:
     task = (at_thtask_t*) _task;
@@ -167,7 +207,7 @@ at_thpool_newtask(at_thpool_t *tp, void (*task_pt)(void *), void *arg) {
     task->do_work = task_pt;
     task->args = arg;
 
-    if (lfqueue_enq(&tp->taskqueue, task) != 1) {
+    if (lfqueue_enq(&tp->taskqueue, task) == -1) {
         fprintf(stderr, "Task unable to assigned to pool, it might be full\n");
         AT_THPOOL_FREE(task);
         return -1;
