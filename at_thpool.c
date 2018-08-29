@@ -190,7 +190,7 @@ at_thpool_gracefully_shutdown(at_thpool_t *tp) {
 SHUTDOWN:
     AT_THPOOL_SHEDYIELD();
     AT_THPOOL_FREE(tp->threads);
-    lfqueue_clear(&tp->taskqueue);
+    lfqueue_destroy(&tp->taskqueue);
     AT_THPOOL_FREE(tp);
 
 }
@@ -199,6 +199,6 @@ void
 at_thpool_immediate_shutdown(at_thpool_t *tp) {
     tp->is_running = 0;
     AT_THPOOL_FREE(tp->threads);
-    lfqueue_clear(&tp->taskqueue);
+    lfqueue_destroy(&tp->taskqueue);
     AT_THPOOL_FREE(tp);
 }
