@@ -27,12 +27,12 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
 #include <errno.h>
 
 #if defined _WIN32 || _WIN64
 #include <windows.h>
 #else
+#include <pthread.h>
 #include <unistd.h> // for usleep
 #endif
 
