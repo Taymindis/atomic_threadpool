@@ -90,16 +90,16 @@ void*
 at_thpool_worker(void *);
 
 at_thpool_t *
-at_thpool_create(int nthreads, int task_backlog) {
+at_thpool_create(int nthreads) {
     int i;
     if (nthreads > MAX_THREADS) {
         fprintf(stderr, "The nthreads is > %d, over max thread will affect the system scalability, it might not scale well\n", MAX_THREADS);
     }
 
-    if ( task_backlog < (nthreads * 6) ) {
-        fprintf(stderr, "task_backlog should at least more than (nthreads * 6) \n");
+    /*if ( task_backlog < (nthreads * nthreads) ) {
+        fprintf(stderr, "task_backlog should at least more than (nthreads * nthreads) \n");
         return NULL;
-    }
+    }*/
 
     at_thpool_t *tp;
     tp = (at_thpool_t*) AT_THPOOL_MALLOC(sizeof(at_thpool_t));
@@ -121,7 +121,7 @@ at_thpool_create(int nthreads, int task_backlog) {
         return NULL;
     }
 
-    if (lfqueue_init(&tp->taskqueue, task_backlog) < 0) {
+    if (lfqueue_init(&tp->taskqueue, nthreads) < 0) {
         AT_THPOOL_ERROR("malloc");
         AT_THPOOL_FREE(tp->threads);
         AT_THPOOL_FREE(tp);
@@ -182,6 +182,7 @@ TASK_PENDING:
             if ( (_task = lfqueue_deq(tq)) ) {
                 goto HANDLE_TASK;
             }
+			Sleep(1);
         }
         AT_THPOOL_SHEDYIELD();
     }
