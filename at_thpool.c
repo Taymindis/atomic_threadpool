@@ -83,11 +83,10 @@ struct at_thpool_s {
 
 
 #ifdef _WIN32 || _WIN64
-unsigned __stdcall
+unsigned __stdcall at_thpool_worker(void *);
 #else
-void*
+void* at_thpool_worker(void *);
 #endif
-at_thpool_worker(void *);
 
 at_thpool_t *
 at_thpool_create(int nthreads) {
@@ -158,11 +157,10 @@ at_thpool_create(int nthreads) {
 }
 
 #ifdef _WIN32 || _WIN64
-unsigned __stdcall 
+unsigned __stdcall at_thpool_worker(void *_tp) {
 #else
-void*
-#endif // _WIN32 || _WIN64
-at_thpool_worker(void *_tp) {
+void* at_thpool_worker(void *_tp) {
+#endif
     at_thpool_t *tp = (at_thpool_t*)_tp;
     AT_THPOOL_INC(&tp->nrunning);
 
@@ -183,7 +181,11 @@ TASK_PENDING:
     }
 
     AT_THPOOL_DEC(&tp->nrunning);
+#ifdef _WIN32 || _WIN64
+	return 0;
+#else
     return NULL;
+#endif
 HANDLE_TASK:
     task = (at_thtask_t*) _task;
     task->do_work(task->args);
