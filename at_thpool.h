@@ -36,7 +36,7 @@ extern "C" {
 
 typedef struct at_thpool_s at_thpool_t;
 
-at_thpool_t *at_thpool_create(int nthreads, int task_backlog);
+at_thpool_t *at_thpool_create(int nthreads);
 
 int at_thpool_newtask(at_thpool_t *pool, void (*task_pt)(void *),void *arg);
 

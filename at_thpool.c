@@ -96,11 +96,6 @@ at_thpool_create(int nthreads) {
         fprintf(stderr, "The nthreads is > %d, over max thread will affect the system scalability, it might not scale well\n", MAX_THREADS);
     }
 
-    /*if ( task_backlog < (nthreads * nthreads) ) {
-        fprintf(stderr, "task_backlog should at least more than (nthreads * nthreads) \n");
-        return NULL;
-    }*/
-
     at_thpool_t *tp;
     tp = (at_thpool_t*) AT_THPOOL_MALLOC(sizeof(at_thpool_t));
     if (tp == NULL) {
