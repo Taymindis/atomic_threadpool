@@ -115,7 +115,7 @@ at_thpool_create(int nthreads) {
         return NULL;
     }
 
-    if (lfqueue_init(&tp->taskqueue, nthreads) < 0) {
+    if (lfqueue_init(&tp->taskqueue) < 0) {
         AT_THPOOL_ERROR("malloc");
         AT_THPOOL_FREE(tp->threads);
         AT_THPOOL_FREE(tp);
