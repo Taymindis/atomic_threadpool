@@ -82,7 +82,7 @@ struct at_thpool_s {
 };
 
 
-#ifdef _WIN32 || _WIN64
+#if defined _WIN32 || defined _WIN64
 unsigned __stdcall at_thpool_worker(void *);
 #else
 void* at_thpool_worker(void *);
@@ -156,7 +156,7 @@ at_thpool_create(int nthreads) {
     return tp;
 }
 
-#ifdef _WIN32 || _WIN64
+#if defined _WIN32 || defined _WIN64
 unsigned __stdcall at_thpool_worker(void *_tp) {
 #else
 void* at_thpool_worker(void *_tp) {
@@ -175,13 +175,13 @@ TASK_PENDING:
             if ( (_task = lfqueue_deq(tq)) ) {
                 goto HANDLE_TASK;
             }
-			Sleep(1);
+			lfqueue_usleep(100);
         }
         AT_THPOOL_SHEDYIELD();
     }
 
     AT_THPOOL_DEC(&tp->nrunning);
-#ifdef _WIN32 || _WIN64
+#if defined _WIN32 || defined _WIN64
 	return 0;
 #else
     return NULL;
