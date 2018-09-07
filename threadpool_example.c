@@ -36,7 +36,7 @@ int main(void) {
 	int nthreads = 8;//sysconf(_SC_NPROCESSORS_ONLN); // Linux
 
 	printf("Share thread pool with %d threads with at lease totalthroughput * nthreads task size\n", nthreads);
-	at_thpool_t *thpool = at_thpool_create(nthreads, nthreads * TASK_SIZE);
+	at_thpool_t *thpool = at_thpool_create(nthreads);
 
 	printf("assigned %d tasks between %d threads\n", TASK_SIZE, nthreads);
 	int i;
@@ -50,7 +50,7 @@ int main(void) {
 #if defined _WIN32 || _WIN64
 	Sleep(1000);
 #else
-	usleep(1000 * 1000);
+	sleep(1);
 #endif
 
 	puts("shutdown thread pool");

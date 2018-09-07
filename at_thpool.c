@@ -77,7 +77,7 @@ struct at_thpool_s {
 	HANDLE *threads;
 #endif
     lfqueue_t taskqueue;
-    int nrunning;
+    size_t nrunning;
     int is_running;
 };
 
@@ -89,8 +89,8 @@ void* at_thpool_worker(void *);
 #endif
 
 at_thpool_t *
-at_thpool_create(int nthreads) {
-    int i;
+at_thpool_create(size_t nthreads) {
+    size_t i;
     if (nthreads > MAX_THREADS) {
         fprintf(stderr, "The nthreads is > %d, over max thread will affect the system scalability, it might not scale well\n", MAX_THREADS);
     }
@@ -128,7 +128,7 @@ at_thpool_create(int nthreads) {
     for (i = 0; i < nthreads; i++) {
         if (pthread_create(&(tp->threads[i]), NULL,  at_thpool_worker, (void*)tp)) {
             if (i != 0) {
-                fprintf(stderr, "maximum thread has reached %d \n", i );
+                fprintf(stderr, "maximum thread has reached %zu \n", i );
                 break;
             } else {
                 AT_THPOOL_ERROR("Failed to establish thread pool");
@@ -143,7 +143,7 @@ at_thpool_create(int nthreads) {
 		tp->threads[i] = (HANDLE)_beginthreadex(NULL, 0, at_thpool_worker, (void *)tp, 0, &udpthreadid);
 		if (tp->threads[i] == 0) {
 			if (i != 0) {
-				fprintf(stderr, "maximum thread has reached %d \n", i);
+				fprintf(stderr, "maximum thread has reached %lld \n", i);
 			}
 			else {
 				AT_THPOOL_ERROR("Failed to establish thread pool");
