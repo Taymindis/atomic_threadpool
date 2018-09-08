@@ -175,7 +175,7 @@ TASK_PENDING:
             if ( (_task = lfqueue_deq(tq)) ) {
                 goto HANDLE_TASK;
             }
-			lfqueue_usleep(100);
+            // lfqueue_sleep(1); // lfqueue_deq will sleep for 1ms if not found
         }
         AT_THPOOL_SHEDYIELD();
     }
