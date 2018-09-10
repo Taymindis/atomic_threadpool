@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <excpt.h>
+//#include <excpt.h>
 #include <at_thpool.h>
 
 #define callStaticByMethod$(returnType, env, clazz, methodName, sig) \
@@ -43,7 +43,7 @@ void runTask_(void* arg) {
 
 	(*_env)->DeleteGlobalRef(_env, refThreadObj);
 
-	rs = (*jvm)->DetachCurrentThread(*jvm);
+	rs = (*jvm)->DetachCurrentThread(jvm);
 	assert(rs == JNI_OK);
 }
 
