@@ -1,6 +1,6 @@
-package com.taymindis.lockfree.test;
+package com.github.taymindis.test;
 
-import com.taymindis.lockfree.AtomicThreadPoolTask;
+import com.github.taymindis.AtomicThreadPoolTask;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

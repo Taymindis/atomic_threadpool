@@ -47,7 +47,7 @@ void runTask_(void* arg) {
 	assert(rs == JNI_OK);
 }
 
-JNIEXPORT jboolean JNICALL Java_com_taymindis_lockfree_AtomicThreadPool_init(JNIEnv *env, jobject obj, jint nthreads) {
+JNIEXPORT jboolean JNICALL Java_com_github_taymindis_AtomicThreadPool_init(JNIEnv *env, jobject obj, jint nthreads) {
 	if (jvm == NULL) {
 		//_env = env;
 		update_curr_jvm(env);
@@ -61,7 +61,7 @@ JNIEXPORT jboolean JNICALL Java_com_taymindis_lockfree_AtomicThreadPool_init(JNI
 	return JNI_TRUE;
 }
 
-JNIEXPORT jboolean JNICALL Java_com_taymindis_lockfree_AtomicThreadPool_newTask(JNIEnv *env, jobject obj, jobject threadObj) {
+JNIEXPORT jboolean JNICALL Java_com_github_taymindis_AtomicThreadPool_newTask(JNIEnv *env, jobject obj, jobject threadObj) {
 	if (tpClass != NULL) {
 		jclass clz = (*env)->GetObjectClass(env, obj);
 		at_thpool_t *thpool = (at_thpool_t *)callByField$(Long, env, clz, obj, "threadpoolPtr", "J");
@@ -77,7 +77,7 @@ JNIEXPORT jboolean JNICALL Java_com_taymindis_lockfree_AtomicThreadPool_newTask(
 }
 
 //JNIEXPORT void JNICALL Java_jni_HelloWorld_init(JNIEnv *env, jobject obj, jint port, jint backlog, jlong szPerRead) {
-JNIEXPORT void JNICALL Java_com_taymindis_lockfree_AtomicThreadPool_shutdown(JNIEnv *env, jobject obj) {
+JNIEXPORT void JNICALL Java_com_github_taymindis_AtomicThreadPool_shutdown(JNIEnv *env, jobject obj) {
 	at_thpool_t *thpool =(at_thpool_t *) callByMethod$(Long, env, tpClass, obj, "getThreadpoolPtr", "()J");
 	if (tpClass != NULL && thpool != NULL && thpool > 0) {
 		at_thpool_gracefully_shutdown(thpool);

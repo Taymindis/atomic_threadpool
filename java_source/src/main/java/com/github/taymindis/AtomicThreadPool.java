@@ -1,4 +1,4 @@
-package com.taymindis.lockfree;
+package com.github.taymindis;
 
 import java.io.IOException;
 

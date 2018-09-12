@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.taymindis.lockfree;
+package com.github.taymindis;
 
 import java.io.File;
 import java.io.FileNotFoundException;

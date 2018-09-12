@@ -1,8 +1,8 @@
-package com.taymindis.lockfree.test;
+package com.github.taymindis.test;
 
 import java.io.IOException;
 
-import com.taymindis.lockfree.AtomicThreadPool;
+import com.github.taymindis.AtomicThreadPool;
 import org.junit.Test;
 import static org.junit.Assert.*;
 /**
