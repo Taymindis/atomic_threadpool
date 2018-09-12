@@ -66,7 +66,7 @@ int main(void) {
 	int nthreads = 8;//sysconf(_SC_NPROCESSORS_ONLN); // Linux
 
 	printf("Share thread pool with %d threads with at lease totalthroughput * nthreads task size\n", nthreads);
-	at_thpool_t *thpool = at_thpool_create(nthreads, nthreads * TASK_SIZE);
+	at_thpool_t *thpool = at_thpool_create(nthreads);
 
 	printf("assigned %d tasks between %d threads\n", TASK_SIZE, nthreads);
 	int i;
@@ -90,6 +90,66 @@ int main(void) {
 }
 
 ```
+
+
+### How to wait for task to finish on main thread
+
+AtomicThreadPool design for lock free, it does not wait for anyone, to wait for specified task to finished, client should pass the value to indicate it has done.
+
+For Example for wait task: 
+
+```c
+
+#include <stdio.h>
+#include <pthread.h>
+#include "at_thpool.h"
+
+typedef struct myagent_s {
+	int has_task_done;
+	void *my_value;
+} my_agent;
+
+void t1(void *arg);
+
+void t1(void *arg) {
+	my_agent *agent = (my_agent*) arg;
+
+	printf("t1 is running on thread #%u \n", (int)pthread_self());
+
+	/** Doing heavy task **/
+
+	agent->has_task_done = 1;
+
+}
+
+int main(void) {
+	int nthreads = 8;//sysconf(_SC_NPROCESSORS_ONLN); // Linux
+
+	printf("Share thread pool with %d threads with at lease totalthroughput * nthreads task size\n", nthreads);
+	at_thpool_t *thpool = at_thpool_create(nthreads);
+
+	int i;
+	my_agent agent;
+	agent.has_task_done = 0
+
+	at_thpool_newtask(thpool, t1, &agent);
+while (!agent.has_task_done) {
+#if defined _WIN32 || _WIN64
+	Sleep(1);
+#else
+	usleep(1000);
+#endif
+}
+
+	puts("shutdown thread pool");
+	at_thpool_gracefully_shutdown(thpool);
+
+	return 0;
+}
+
+
+```
+
 
 ## For manual build
 gcc -std=c11 -I./ -Ilfqueue/ at_thpool.c lfqueue/lfqueue.c threadpool_example.c -pthread
