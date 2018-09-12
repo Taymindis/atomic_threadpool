@@ -105,6 +105,8 @@ public class NativeUtils {
             throw new FileNotFoundException("File " + path + " was not found inside JAR.");
         }
 
+        temp.setReadable(true, false);
+
         try {
             System.load(temp.getAbsolutePath());
         } finally {
@@ -138,7 +140,7 @@ public class NativeUtils {
         
         if (!generatedDir.mkdir())
             throw new IOException("Failed to create temp directory " + generatedDir.getName());
-        
+        generatedDir.setReadable(true, false);
         return generatedDir;
     }
 }

@@ -53,7 +53,7 @@ JNIEXPORT jboolean JNICALL Java_com_taymindis_lockfree_AtomicThreadPool_init(JNI
 		update_curr_jvm(env);
 		tpClass = (*env)->GetObjectClass(env, obj);
 	}
-	printf("Intializing threadpool");
+	printf("%s, %d\n", "Intializing threadpool", nthreads);
 	at_thpool_t *thpool = at_thpool_create(nthreads);
 
 	callByMethod$2(Void, env, tpClass, obj, "setThreadpoolPtr", "(J)V", (jlong)thpool);
