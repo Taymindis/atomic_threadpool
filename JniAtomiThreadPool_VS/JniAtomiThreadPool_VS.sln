@@ -9,6 +9,8 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		FullPackMT|x64 = FullPackMT|x64
+		FullPackMT|x86 = FullPackMT|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
@@ -17,6 +19,10 @@ Global
 		{50C8DCEE-CAFF-42E0-9B3B-9A8E76FF7D9D}.Debug|x64.Build.0 = Debug|x64
 		{50C8DCEE-CAFF-42E0-9B3B-9A8E76FF7D9D}.Debug|x86.ActiveCfg = Debug|Win32
 		{50C8DCEE-CAFF-42E0-9B3B-9A8E76FF7D9D}.Debug|x86.Build.0 = Debug|Win32
+		{50C8DCEE-CAFF-42E0-9B3B-9A8E76FF7D9D}.FullPackMT|x64.ActiveCfg = FullPackMT|x64
+		{50C8DCEE-CAFF-42E0-9B3B-9A8E76FF7D9D}.FullPackMT|x64.Build.0 = FullPackMT|x64
+		{50C8DCEE-CAFF-42E0-9B3B-9A8E76FF7D9D}.FullPackMT|x86.ActiveCfg = FullPackMT|Win32
+		{50C8DCEE-CAFF-42E0-9B3B-9A8E76FF7D9D}.FullPackMT|x86.Build.0 = FullPackMT|Win32
 		{50C8DCEE-CAFF-42E0-9B3B-9A8E76FF7D9D}.Release|x64.ActiveCfg = Release|x64
 		{50C8DCEE-CAFF-42E0-9B3B-9A8E76FF7D9D}.Release|x64.Build.0 = Release|x64
 		{50C8DCEE-CAFF-42E0-9B3B-9A8E76FF7D9D}.Release|x86.ActiveCfg = Release|Win32

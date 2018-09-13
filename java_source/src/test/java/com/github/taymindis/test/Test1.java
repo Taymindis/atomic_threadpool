@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 public class Test1 {
 
     @Test
-    public void testLoadLibraryIllegalPath() throws IOException, InterruptedException {
+    public void testRun() throws IOException, InterruptedException {
         System.out.println("Thread pool is running in 2 sec");
         Thread.sleep(2000);
         AtomicThreadPool p = new AtomicThreadPool();

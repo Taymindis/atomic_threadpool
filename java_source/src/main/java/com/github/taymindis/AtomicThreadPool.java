@@ -1,6 +1,7 @@
 package com.github.taymindis;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * Created by woonsh on 10/9/2018.
@@ -8,6 +9,7 @@ import java.io.IOException;
 public class AtomicThreadPool {
     private long threadpoolPtr = -1;
     private static String OS = System.getProperty("os.name").toLowerCase();
+    private static final Logger logger = Logger.getLogger(AtomicThreadPool.class.getName());
 
     public long getThreadpoolPtr() {
         return threadpoolPtr;
@@ -60,12 +62,29 @@ public class AtomicThreadPool {
                 NativeUtils.loadLibraryFromJar("/JniAtomiThreadPool_VS64.dll");
             } else if(isMac()){
                 // Pending build from source
+                logger.warning(" Mac is not support yet....");
 //                NativeUtils.loadLibraryFromJar("/libatpool_jni.dylib");
             } else {
                 NativeUtils.loadLibraryFromJar("/libatpool_jni.so");
             }
         } catch (IOException e) {
             e.printStackTrace(); // This is probably not the best way to handle exception :-)
+        } catch (UnsatisfiedLinkError e) {
+            /** It could be no dependencies found, load full pack **/
+            logger.warning(" no dependencies found, load full pack library....");
+            try {
+                if (isWindows32()) {
+                    NativeUtils.loadLibraryFromJar("/JniAtomiThreadPool_VS32_full.dll");
+                } else if (isWindows64()) {
+                    NativeUtils.loadLibraryFromJar("/JniAtomiThreadPool_VS64_full.dll");
+                } else if(isMac()){
+                    logger.warning(" Mac is not support yet....");
+                    //                NativeUtils.loadLibraryFromJar("/libatpool_jni.dylib");
+                } else {
+                    NativeUtils.loadLibraryFromJar("/libatpool_jni.so");
+                }
+            } catch (IOException xe) {
+            }
         }
     }
 }

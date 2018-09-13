@@ -71,7 +71,7 @@ public class NativeUtils {
      * (restriction of {@link File#createTempFile(String, String)}).
      * @throws FileNotFoundException If the file could not be found inside the JAR.
      */
-    public static void loadLibraryFromJar(String path) throws IOException {
+    public static void loadLibraryFromJar(String path) throws IOException, UnsatisfiedLinkError {
  
         if (null == path || !path.startsWith("/")) {
             throw new IllegalArgumentException("The path has to be absolute (start with '/').");
