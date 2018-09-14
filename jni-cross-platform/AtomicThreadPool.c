@@ -25,7 +25,6 @@
 
 static JavaVM *jvm = NULL;				// Pointer to the JVM (Java Virtual Machine)
 										//static JNIEnv *_env = NULL;
-static jclass tpClass = NULL;
 void update_curr_jvm(JNIEnv *env);
 
 void runTask_(void* arg) {
@@ -38,11 +37,11 @@ void runTask_(void* arg) {
 	}
 
 	jobject refThreadObj = (jobject)arg;
-	jclass threadPoolClass = (*_env)->GetObjectClass(_env, refThreadObj);
-	callByMethod$(Void, _env, threadPoolClass, refThreadObj, "runTask", "()V");
+	jclass clz = (*_env)->GetObjectClass(_env, refThreadObj);
+	callByMethod$(Void, _env, clz, refThreadObj, "runTask", "()V");
 
 	(*_env)->DeleteGlobalRef(_env, refThreadObj);
-	(*_env)->DeleteLocalRef(_env, threadPoolClass);
+	(*_env)->DeleteLocalRef(_env, clz);
 
 	rs = (*jvm)->DetachCurrentThread(jvm);
 	assert(rs == JNI_OK);
@@ -53,13 +52,13 @@ JNIEXPORT jboolean JNICALL Java_com_github_taymindis_AtomicThreadPool_init(JNIEn
 		//_env = env;
 		update_curr_jvm(env);
 	}
-	tpClass = (*env)->GetObjectClass(env, obj);
+	jclass clz = (*env)->GetObjectClass(env, obj);
 	printf("%s, %d\n", "Intializing threadpool", nthreads);
 	at_thpool_t *thpool = at_thpool_create(nthreads);
 
-	callByMethod$2(Void, env, tpClass, obj, "setThreadpoolPtr", "(J)V", (jlong)thpool);
+	callByMethod$2(Void, env, clz, obj, "setThreadpoolPtr", "(J)V", (jlong)thpool);
 
-	(*env)->DeleteLocalRef(env, tpClass);
+	(*env)->DeleteLocalRef(env, clz);
 
 
 	return JNI_TRUE;
@@ -81,10 +80,12 @@ JNIEXPORT jboolean JNICALL Java_com_github_taymindis_AtomicThreadPool_newTask(JN
 
 //JNIEXPORT void JNICALL Java_jni_HelloWorld_init(JNIEnv *env, jobject obj, jint port, jint backlog, jlong szPerRead) {
 JNIEXPORT void JNICALL Java_com_github_taymindis_AtomicThreadPool_shutdown(JNIEnv *env, jobject obj) {
-	at_thpool_t *thpool =(at_thpool_t *) callByMethod$(Long, env, tpClass, obj, "getThreadpoolPtr", "()J");
-	if (tpClass != NULL && thpool != NULL && thpool > 0) {
+	jclass clz = (*env)->GetObjectClass(env, obj);
+	at_thpool_t *thpool =(at_thpool_t *) callByMethod$(Long, env, clz, obj, "getThreadpoolPtr", "()J");
+	if (thpool != NULL && thpool > 0) {
 		at_thpool_gracefully_shutdown(thpool);
 	}
+	(*env)->DeleteLocalRef(env, clz);
 }
 
 void update_curr_jvm(JNIEnv *env) {
