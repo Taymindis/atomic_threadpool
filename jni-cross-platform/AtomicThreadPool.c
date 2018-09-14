@@ -52,15 +52,15 @@ JNIEXPORT jboolean JNICALL Java_com_github_taymindis_AtomicThreadPool_init(JNIEn
 	if (jvm == NULL) {
 		//_env = env;
 		update_curr_jvm(env);
-		tpClass = (*env)->GetObjectClass(env, obj);
-		printf("%s, %d\n", "Intializing threadpool", nthreads);
-		at_thpool_t *thpool = at_thpool_create(nthreads);
-
-		callByMethod$2(Void, env, tpClass, obj, "setThreadpoolPtr", "(J)V", (jlong)thpool);
-
-		(*env)->DeleteLocalRef(env, tpClass);
-
 	}
+	tpClass = (*env)->GetObjectClass(env, obj);
+	printf("%s, %d\n", "Intializing threadpool", nthreads);
+	at_thpool_t *thpool = at_thpool_create(nthreads);
+
+	callByMethod$2(Void, env, tpClass, obj, "setThreadpoolPtr", "(J)V", (jlong)thpool);
+
+	(*env)->DeleteLocalRef(env, tpClass);
+
 
 	return JNI_TRUE;
 }
