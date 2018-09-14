@@ -42,6 +42,7 @@ void runTask_(void* arg) {
 	callByMethod$(Void, _env, threadPoolClass, refThreadObj, "runTask", "()V");
 
 	(*_env)->DeleteGlobalRef(_env, refThreadObj);
+	(*_env)->DeleteLocalRef(_env, threadPoolClass);
 
 	rs = (*jvm)->DetachCurrentThread(jvm);
 	assert(rs == JNI_OK);
@@ -52,27 +53,29 @@ JNIEXPORT jboolean JNICALL Java_com_github_taymindis_AtomicThreadPool_init(JNIEn
 		//_env = env;
 		update_curr_jvm(env);
 		tpClass = (*env)->GetObjectClass(env, obj);
-	}
-	printf("%s, %d\n", "Intializing threadpool", nthreads);
-	at_thpool_t *thpool = at_thpool_create(nthreads);
+		printf("%s, %d\n", "Intializing threadpool", nthreads);
+		at_thpool_t *thpool = at_thpool_create(nthreads);
 
-	callByMethod$2(Void, env, tpClass, obj, "setThreadpoolPtr", "(J)V", (jlong)thpool);
+		callByMethod$2(Void, env, tpClass, obj, "setThreadpoolPtr", "(J)V", (jlong)thpool);
+
+		(*env)->DeleteLocalRef(env, tpClass);
+
+	}
 
 	return JNI_TRUE;
 }
 
 JNIEXPORT jboolean JNICALL Java_com_github_taymindis_AtomicThreadPool_newTask(JNIEnv *env, jobject obj, jobject threadObj) {
-	if (tpClass != NULL) {
-		jclass clz = (*env)->GetObjectClass(env, obj);
-		at_thpool_t *thpool = (at_thpool_t *)callByField$(Long, env, clz, obj, "threadpoolPtr", "J");
-		jobject refObj = (*env)->NewGlobalRef(env, threadObj);
-		if (thpool != NULL && thpool > 0) {
-			if (at_thpool_newtask(thpool, runTask_, refObj) != -1) {
-				return JNI_TRUE;
-			}
+	jclass clz = (*env)->GetObjectClass(env, obj);
+	at_thpool_t *thpool = (at_thpool_t *)callByField$(Long, env, clz, obj, "threadpoolPtr", "J");
+	jobject refObj = (*env)->NewGlobalRef(env, threadObj);
+	if (thpool != NULL && thpool > 0) {
+		if (at_thpool_newtask(thpool, runTask_, refObj) != -1) {
+			return JNI_TRUE;
 		}
-	}	
+	}
 	printf("The pool has not initialized yet");
+	(*env)->DeleteLocalRef(env, clz);
 	return JNI_FALSE;
 }
 

@@ -66,10 +66,10 @@ public class AtomicThreadPool {
     static {
         try {
             if (isWindows32()) {
-                NativeUtils.loadLibraryFromJar("/JniAtomiThreadPool_VS32.dll");
+                NativeUtils.loadLibraryFromJar("/VS32.dll");
             } else if (isWindows64()) {
 //            System.load("C:\\msys64\\home\\woonsh\\git-project\\AtomicThreadPool\\x64\\Release\\AtomicThreadPool.dll");
-                NativeUtils.loadLibraryFromJar("/JniAtomiThreadPool_VS64.dll");
+                NativeUtils.loadLibraryFromJar("/VS64.dll");
             } else if(isMac()){
                 // Pending build from source
                 logger.warning(" Mac is not support yet....");
@@ -84,9 +84,9 @@ public class AtomicThreadPool {
             logger.warning(" no dependencies found, load full pack library....");
             try {
                 if (isWindows32()) {
-                    NativeUtils.loadLibraryFromJar("/JniAtomiThreadPool_VS32_full.dll");
+                    NativeUtils.loadLibraryFromJar("/VS32_full.dll");
                 } else if (isWindows64()) {
-                    NativeUtils.loadLibraryFromJar("/JniAtomiThreadPool_VS64_full.dll");
+                    NativeUtils.loadLibraryFromJar("/VS64_full.dll");
                 } else if(isMac()){
                     logger.warning(" Mac is not support yet....");
                     //                NativeUtils.loadLibraryFromJar("/libatpool_jni.dylib");
