@@ -11,6 +11,16 @@ public class AtomicThreadPool {
     private static String OS = System.getProperty("os.name").toLowerCase();
     private static final Logger logger = Logger.getLogger(AtomicThreadPool.class.getName());
 
+    public AtomicThreadPool(int nthreads) {
+        try {
+            if (!init(nthreads)) {
+                throw new Exception("Unable to initialize thread pool correctly");
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public long getThreadpoolPtr() {
         return threadpoolPtr;
     }
@@ -19,7 +29,7 @@ public class AtomicThreadPool {
         this.threadpoolPtr = threadpoolPtr;
     }
 
-    public native boolean init(int nthreads);
+    private native boolean init(int nthreads);
     public native boolean newTask(AtomicThreadPoolTask o);
 
     public static boolean isWindows32() {

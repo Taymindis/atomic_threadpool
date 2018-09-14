@@ -14,8 +14,7 @@ public class Test1 {
     public void testRun() throws IOException, InterruptedException {
         System.out.println("Thread pool is running in 2 sec");
         Thread.sleep(2000);
-        AtomicThreadPool p = new AtomicThreadPool();
-        p.init(8);
+        AtomicThreadPool p = new AtomicThreadPool(8);
 
         for(int i=0; i< 1000; i++) {
             assertTrue(p.newTask(new MyTask(i)));
