@@ -31,6 +31,7 @@ public class AtomicThreadPool {
 
     private native boolean init(int nthreads);
     public native boolean newTask(AtomicThreadPoolTask o);
+    public native boolean shutdown();
 
     public static boolean isWindows32() {
 

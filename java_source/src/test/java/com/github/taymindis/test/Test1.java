@@ -22,6 +22,8 @@ public class Test1 {
 
         Thread.sleep(3000);
         assertTrue(MyTask.getTotalRun().intValue() == 1000);
+
+        p.shutdown();
     }
 
 }
