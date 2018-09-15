@@ -20,6 +20,9 @@ public class AtomicThreadPool {
             e.printStackTrace();
         }
     }
+    
+    public native boolean newTask(AtomicThreadPoolTask o);
+    public native boolean shutdown();
 
     public long getThreadpoolPtr() {
         return threadpoolPtr;
@@ -30,39 +33,36 @@ public class AtomicThreadPool {
     }
 
     private native boolean init(int nthreads);
-    public native boolean newTask(AtomicThreadPoolTask o);
-    public native boolean shutdown();
 
-    public static boolean isWindows32() {
+    private static boolean isWindows32() {
 
         return ( OS.indexOf("win") >= 0 &&  "32".equals(System.getProperty("sun.arch.data.model")) );
 
     }
 
-    public static boolean isWindows64() {
+    private static boolean isWindows64() {
 
         return (OS.indexOf("win") >= 0 &&  "64".equals(System.getProperty("sun.arch.data.model")));
 
     }
 
-    public static boolean isMac() {
+    private static boolean isMac() {
 
         return (OS.indexOf("mac") >= 0);
 
     }
 
-    public static boolean isUnix() {
+    private static boolean isUnix() {
 
         return (OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0 );
 
     }
 
-    public static boolean isSolaris() {
+    private static boolean isSolaris() {
 
         return (OS.indexOf("sunos") >= 0);
 
     }
-
 
     static {
         try {

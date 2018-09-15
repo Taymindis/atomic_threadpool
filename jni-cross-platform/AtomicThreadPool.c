@@ -86,7 +86,6 @@ JNIEXPORT jboolean JNICALL Java_com_github_taymindis_AtomicThreadPool_newTask(JN
 	return JNI_FALSE;
 }
 
-//JNIEXPORT void JNICALL Java_jni_HelloWorld_init(JNIEnv *env, jobject obj, jint port, jint backlog, jlong szPerRead) {
 JNIEXPORT void JNICALL Java_com_github_taymindis_AtomicThreadPool_shutdown(JNIEnv *env, jobject obj) {
 	jclass clz = (*env)->GetObjectClass(env, obj);
 	at_thpool_t *thpool =(at_thpool_t *) callByMethod$(Long, env, clz, obj, "getThreadpoolPtr", "()J");
