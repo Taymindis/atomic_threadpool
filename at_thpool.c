@@ -81,7 +81,6 @@ struct at_thpool_s {
     int is_running;
 };
 
-
 #if defined _WIN32 || defined _WIN64
 unsigned __stdcall at_thpool_worker(void *);
 #else
