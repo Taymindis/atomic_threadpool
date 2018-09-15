@@ -58,6 +58,14 @@ JNIEXPORT jboolean JNICALL Java_com_github_taymindis_AtomicThreadPool_init(JNIEn
 
 	callByMethod$2(Void, env, clz, obj, "setThreadpoolPtr", "(J)V", (jlong)thpool);
 
+	/****
+	* Local references are garbage collected when the native function returns to Java (when Java calls native) 
+	* or when the calling thread is detached from the JVM (in native calls Java). 
+	* You need explicit DeleteLocalRef only when you have a long lived native function 
+	* (e.g., a main loop) or create a large number of transient objects in a loop
+	* Since you are return JNI true, DeleteLocalRef is not necessary at this point.
+	****/
+
 	(*env)->DeleteLocalRef(env, clz);
 
 
