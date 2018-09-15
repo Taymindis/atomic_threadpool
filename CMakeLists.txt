@@ -22,7 +22,7 @@ add_executable(example_threadpool ${example_test})
 target_link_libraries(example_threadpool PUBLIC pthread)
 
 
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -Wall -Wstrict-prototypes -Wmissing-prototypes")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Wall -Wstrict-prototypes -Wmissing-prototypes")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wmissing-declarations -Wshadow -Wpointer-arith -Wcast-qual")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wsign-compare -pedantic")
 

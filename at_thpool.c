@@ -1,19 +1,19 @@
 /*
 * BSD 2-Clause License
-* 
+*
 * Copyright (c) 2018, Taymindis Woon
 * All rights reserved.
-* 
+*
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
-* 
+*
 * * Redistributions of source code must retain the above copyright notice, this
 *   list of conditions and the following disclaimer.
-* 
+*
 * * Redistributions in binary form must reproduce the above copyright notice,
 *   this list of conditions and the following disclaimer in the documentation
 *   and/or other materials provided with the distribution.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -51,7 +51,7 @@
 #define AT_THPOOL_MALLOC malloc
 #define AT_THPOOL_FREE free
 
-#if defined _WIN32 
+#if defined _WIN32
 #define AT_THPOOL_INC(v) InterlockedExchangeAddNoFence(v, 1)
 #define AT_THPOOL_DEC(v) InterlockedExchangeAddNoFence(v, -1)
 #define AT_THPOOL_SHEDYIELD SwitchToThread
@@ -72,9 +72,9 @@ typedef struct {
 
 struct at_thpool_s {
 #if defined __GNUC__ || defined __CYGWIN__ || defined __MINGW32__ || defined __APPLE__
-	pthread_t *threads;
+    pthread_t *threads;
 #elif defined _WIN32 || _WIN64
-	HANDLE *threads;
+    HANDLE *threads;
 #endif
     lfqueue_t taskqueue;
     size_t nrunning;
@@ -103,9 +103,9 @@ at_thpool_create(size_t nthreads) {
     }
 
 #if defined __GNUC__ || defined __CYGWIN__ || defined __MINGW32__ || defined __APPLE__
-	tp->threads = (pthread_t *)AT_THPOOL_MALLOC(sizeof(pthread_t) * nthreads);
+    tp->threads = (pthread_t *)AT_THPOOL_MALLOC(sizeof(pthread_t) * nthreads);
 #elif defined _WIN32 || _WIN64
-	tp->threads = (HANDLE)AT_THPOOL_MALLOC(sizeof(HANDLE) * nthreads);
+    tp->threads = (HANDLE)AT_THPOOL_MALLOC(sizeof(HANDLE) * nthreads);
 #endif
 
     tp->nrunning = 0;
@@ -138,20 +138,20 @@ at_thpool_create(size_t nthreads) {
         pthread_detach(tp->threads[i]);
     }
 #elif defined _WIN32 || _WIN64
-	for (i = 0; i < nthreads; i++) {
-		unsigned udpthreadid;
-		tp->threads[i] = (HANDLE)_beginthreadex(NULL, 0, at_thpool_worker, (void *)tp, 0, &udpthreadid);
-		if (tp->threads[i] == 0) {
-			if (i != 0) {
-				fprintf(stderr, "maximum thread has reached %lld \n", i);
-			}
-			else {
-				AT_THPOOL_ERROR("Failed to establish thread pool");
-				at_thpool_immediate_shutdown(tp);
-			}
-		}
-		CloseHandle(tp->threads[i]);
-	}
+    for (i = 0; i < nthreads; i++) {
+        unsigned udpthreadid;
+        tp->threads[i] = (HANDLE)_beginthreadex(NULL, 0, at_thpool_worker, (void *)tp, 0, &udpthreadid);
+        if (tp->threads[i] == 0) {
+            if (i != 0) {
+                fprintf(stderr, "maximum thread has reached %lld \n", i);
+            }
+            else {
+                AT_THPOOL_ERROR("Failed to establish thread pool");
+                at_thpool_immediate_shutdown(tp);
+            }
+        }
+        CloseHandle(tp->threads[i]);
+    }
 #endif
     return tp;
 }
@@ -167,22 +167,18 @@ void* at_thpool_worker(void *_tp) {
     at_thtask_t *task;
     void *_task;
     lfqueue_t *tq = &tp->taskqueue;
-    int i;
 
 TASK_PENDING:
     while (tp->is_running) {
-        for (i = 0; i < DEF_SPIN_LOCK_CYCLE; i++) {
-            if ( (_task = lfqueue_deq(tq)) ) {
-                goto HANDLE_TASK;
-            }
-            // lfqueue_sleep(1); // lfqueue_deq will sleep for 1ms if not found
+        if ( (_task = lfqueue_deq(tq)) ) {
+            goto HANDLE_TASK;
         }
-        AT_THPOOL_SHEDYIELD();
+        lfqueue_sleep(1);
     }
 
     AT_THPOOL_DEC(&tp->nrunning);
 #if defined _WIN32 || defined _WIN64
-	return 0;
+    return 0;
 #else
     return NULL;
 #endif
@@ -226,9 +222,9 @@ at_thpool_gracefully_shutdown(at_thpool_t *tp) {
         AT_THPOOL_SHEDYIELD();
     }
 SHUTDOWN:
-    AT_THPOOL_SHEDYIELD();
-    AT_THPOOL_FREE(tp->threads);
     lfqueue_destroy(&tp->taskqueue);
+    lfqueue_sleep(100);
+    AT_THPOOL_FREE(tp->threads);
     AT_THPOOL_FREE(tp);
 
 }
